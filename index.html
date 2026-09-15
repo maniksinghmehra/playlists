@@ -130,8 +130,8 @@ button, a, .playlist {
 
 .admin-link {
   position: fixed;
-  right: 24px;
-  top: 24px;
+  top: max(24px, env(safe-area-inset-top));
+  right: max(24px, env(safe-area-inset-right));
   z-index: 20;
   width: 48px;
   height: 48px;
@@ -145,7 +145,10 @@ button, a, .playlist {
   box-shadow: 0 10px 30px rgba(0,0,0,0.45);
   font-size: 1.8rem;
   font-weight: 300;
-  line-height: 1;
+  line-height: 48px;
+  text-align: center;
+  padding: 0;
+  -webkit-appearance: none;
   text-decoration: none;
   backdrop-filter: blur(12px);
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
@@ -584,6 +587,7 @@ Stop-Process -Id 17584.review-overlay.active .rw-actions { transition-delay: 0.5
     right: max(14px, env(safe-area-inset-right));
     width: 46px;
     height: 46px;
+    line-height: 46px;
   }
 
   .playlist-grid {
@@ -744,7 +748,7 @@ Stop-Process -Id 17584.review-overlay.active .rw-actions { transition-delay: 0.5
 </div>
 
 <div class="cursor-glow" id="cursor-glow"></div>
-<a class="admin-link" href="admin.html" aria-label="Open playlist admin page" title="Add playlist">+</a>
+<a class="admin-link" href="admin.html" target="_blank" rel="noopener" aria-label="Open playlist admin page in a new tab" title="Add playlist">+</a>
 
 <div class="review-overlay" id="overlay">
   <div class="review-window" id="review-window" role="dialog" aria-modal="true" aria-labelledby="rw-title" tabindex="-1">
