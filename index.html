@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<meta property="og:image" content="playlist-cover.png">
+<meta property="og:title" content="My Playlists — Manik Singh Mehra">
+<meta property="og:description" content="A curated collection of my favorite playlists.">
+<meta property="og:type" content="website">
+
+<meta name="theme-color" content="#0b0d10">
+<title>My Playlists</title>
+
+<link rel="icon" type="image/png" href="playlist-cover.png">
+<link rel="shortcut icon" type="image/png" href="playlist-cover.png">
+<link rel="apple-touch-icon" href="playlist-cover.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Courier+New&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --text: #eaeaea;
+  --muted: rgba(234,234,234,0.6);
+  --card: rgba(22,24,28,0.92);
+  --card-border: rgba(255,255,255,0.08);
+  --radius: 14px;
+  --font: 'Inter', sans-serif;
+  --serif: 'Lora', serif;
+  --card-width: 260px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) #0b0d10;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font);
+  color: var(--text);
+  background: #0b0d10;
+  overflow-x: hidden;
+  cursor: default;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.window-open {
+  overflow: hidden;
+  touch-action: none;
+  padding-right: 10px;
+}
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #0b0d10; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 5px;
+  border: 2px solid #0b0d10;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+
+.bg {
+  position: fixed;
+  inset: -60%;
+  z-index: -2;
+  filter: blur(50px);
+  will-change: transform;
+  transform: translateZ(0);
+}
+.bg::before, .bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.bg::before {
+  background:
+    radial-gradient(40% 35% at 20% 30%, rgba(42,47,85,.65), transparent 60%),
+    radial-gradient(45% 40% at 80% 40%, rgba(27,58,75,.65), transparent 60%),
+    radial-gradient(35% 35% at 50% 80%, rgba(46,27,63,.6), transparent 60%);
+  animation: flowA 90s linear infinite;
+}
+.bg::after {
+  background:
+    radial-gradient(38% 34% at 30% 60%, rgba(140,40,55,.45), transparent 65%),
+    radial-gradient(30% 30% at 70% 20%, rgba(110,30,45,.35), transparent 65%);
+  animation: flowB 120s linear infinite;
+}
+@keyframes flowA { to { transform: rotate(360deg); } }
+@keyframes flowB { to { transform: rotate(-360deg); } }
+
+.noise {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  opacity: 0.05;
+  pointer-events: none;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAA5OTkAAABMTExERERmZmYzMzMyMjJ43I3xAAAACHRSTlMAMwAqzMzMzMwnXQ31AAAAWUlEQVQ4y2NgwA78DgwM+hkYmB0YmD8wMD9gYJ7AwHyAgXkAAwPDDwYGxv8MDAwM/xgYGP4xMDP8+8/AMJ/xHwPDf8Z/DAz/Gf8xMPxn/M/A8J/xPwPDf0YGAE/kF/281b5DAAAAAElFTkSuQmCC");
+  background-size: 120px;
+}
+
+.cursor-glow {
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  margin-left: -300px;
+  margin-top: -300px;
+  top: 0;
+  left: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 60%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+  will-change: transform;
+}
+
+.wrap {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 100px 24px 120px;
+}
+
+@media (min-width: 1920px) {
+  .wrap {
+    max-width: 1800px;
+    padding: 100px 32px 120px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .wrap {
+    max-width: 100%;
+    padding: 60px 20px 100px;
+  }
+}
+
+header {
+  text-align: center;
+  margin-bottom: 75px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: 0.2s;
+}
+
+header h1 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: #eaeaea;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+}
+
+header p {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-top: 0;
+}
+
+.playlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 36px;
+  margin-bottom: 80px;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: 0.4s;
+}
+
+/* Large monitors (1920px+) - 6 per row */
+@media (min-width: 1920px) {
+  .playlist-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 40px;
+  }
+}
+
+/* Desktop/Laptop (1440px-1919px) - 5 per row */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .playlist-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 36px;
+  }
+}
+
+/* Laptop (1024px-1439px) - 4 per row */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .playlist-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+}
+
+/* Tablet (768px-1023px) - 3 per row */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .playlist-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+}
+
+.playlist {
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  background: transparent;
+  border: none;
+  text-align: left;
+  perspective: 1200px;
+  border-radius: 10px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.playlist:focus-visible .playlist-inner {
+  box-shadow: 0 0 0 2px var(--text);
+}
+
+.playlist-inner {
+  height: 100%;
+  min-height: 0;
+  background: var(--card);
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, filter 0.25s ease;
+  box-shadow:
+    0 15px 35px rgba(0,0,0,0.6),
+    0 0 80px -10px rgba(160, 40, 60, 0.22);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.playlist-inner .playlist-art,
+.playlist-inner h2,
+.playlist-inner .creator,
+.playlist-inner .description {
+  transform: translateZ(0);
+  transition: transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.glare {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15), transparent 70%);
+  opacity: 0;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 50;
+  transition: opacity 0.2s ease;
+  transform: translateZ(1px);
+}
+
+@media (hover: hover) {
+  .playlist-grid:has(.playlist:hover) .playlist:not(:hover) .playlist-inner {
+    filter: brightness(.45) saturate(.7) blur(.6px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+  }
+
+  .playlist:hover .playlist-inner {
+    box-shadow:
+      0 25px 50px rgba(0,0,0,0.8),
+      0 0 100px -5px rgba(170, 50, 70, 0.35);
+  }
+
+  .playlist:hover .glare {
+    opacity: 1;
+  }
+}
+
+.playlist-art {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  pointer-events: none;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  background-color: #222;
+}
+
+.playlist h2 {
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 2.6em;
+  text-wrap: balance;
+}
+
+.playlist .creator {
+  font-size: .8rem;
+  color: #b5b5b5;
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+.playlist .description {
+  font-size: .88rem;
+  color: #d0d0d0;
+  margin-top: 0;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple-anim 0.6s linear;
+  background-color: rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  z-index: 100;
+}
+
+@keyframes ripple-anim {
+  to { transform: scale(4); opacity: 0; }
+}
+
+.review-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,.15), rgba(0,0,0,.65));
+  backdrop-filter: blur(38px) saturate(.85);
+  -webkit-backdrop-filter: blur(38px) saturate(.85);
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.review-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.review-window {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(900px, 94vw);
+  max-height: 88vh;
+  background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.03) 35%, rgba(0,0,0,.35) 100%);
+  backdrop-filter: blur(34px) saturate(1.1);
+  -webkit-backdrop-filter: blur(34px) saturate(1.1);
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,.14);
+  padding: 48px;
+  padding-bottom: 80px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25), inset 0 -40px 60px rgba(0,0,0,.45), 0 60px 140px rgba(0,0,0,.9);
+  will-change: transform, opacity;
+  transform: translate(-50%, -50%) scale(0.94);
+  transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.3s ease;
+  outline: none;
+}
+
+.review-overlay.active .review-window {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  transition: transform 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.15), opacity 0.5s ease;
+}
+
+.rw-content > * {
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.review-overlay.active .rw-content > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.review-overlay.active h3 { transition-delay: 0.1s; }
+.review-overlay.active .rw-creator { transition-delay: 0.2s; }
+.review-overlay.active .rw-text { transition-delay: 0.3s; }
+Stop-Process -Id 17584.review-overlay.active .rw-actions { transition-delay: 0.5s; }
+
+.rw-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 48px;
+  align-items: stretch;
+}
+
+.review-window h3 {
+  font-size: 1.6rem;
+  color: var(--text);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.review-window .rw-creator {
+  color: var(--muted);
+  margin-bottom: 24px;
+  font-size: 1.1rem;
+  font-style: italic;
+}
+
+.review-window .rw-text {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: #e6e6e6;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  max-width: 65ch;
+  margin-top: 0;
+  opacity: 0.95;
+}
+
+.rw-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.rw-actions {
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  text-decoration: none;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: transform 0.2s ease, filter 0.2s ease, background 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.08);
+  color: #eaeaea;
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.2);
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.btn:active { transform: translateY(0); }
+.btn:focus-visible { outline: 2px solid white; outline-offset: 2px; }
+
+.close-btn {
+  position: absolute;
+  top: 28px;
+  right: 28px;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  opacity: 0.6;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease, color 0.3s ease;
+  z-index: 10;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn svg { width: 24px; height: 24px; display: block; }
+.close-btn:hover { opacity: 1; color: var(--text); transform: rotate(90deg) scale(1.1); }
+.close-btn:active { transform: rotate(90deg) scale(0.95); }
+.close-btn:focus-visible { outline: 2px solid white; opacity: 1; }
+
+.rw-visual img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+  display: block;
+}
+
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .wrap { padding: 40px 20px 80px; }
+
+  .playlist-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .playlist-inner { min-height: 0; padding: 12px; }
+
+  .review-overlay {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(0,0,0,0.8);
+  }
+
+  .review-window {
+    background: rgba(22, 24, 28, 0.95) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255,255,255,0.15);
+    width: 96vw !important;
+    height: auto;
+    max-height: 85vh;
+    padding: 24px 20px 80px 20px !important;
+    border-radius: 20px;
+    top: 50% !important;
+    left: 50% !important;
+    bottom: auto !important;
+    transform: translate(-50%, 100vh) !important;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1) !important;
+  }
+
+  .review-overlay.active .review-window { transform: translate(-50%, -50%) !important; }
+
+  .playlist-inner {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+    transition: transform 0.1s ease !important;
+  }
+
+  .bg { filter: blur(30px); opacity: 0.6; }
+  .bg::before, .bg::after { animation: none !important; }
+
+  .rw-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  .rw-visual {
+    width: 130px !important;
+    max-width: 130px !important;
+    min-width: 130px !important;
+    margin: 0 auto 12px !important;
+  }
+
+  .rw-visual img {
+    width: 130px !important;
+    height: 130px !important;
+    max-width: 130px !important;
+    max-height: 130px !important;
+    aspect-ratio: 1 / 1 !important;
+    object-fit: cover !important;
+    border-radius: 12px;
+  }
+
+  .rw-content { text-align: center; }
+  .review-window h3 { font-size: 1.3rem; margin-bottom: 4px; }
+  .review-window .rw-creator { font-size: 0.95rem; margin-bottom: 12px; }
+
+  .review-window .rw-text {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    text-align: left;
+  }
+
+  .rw-actions { justify-content: center; margin-top: 36px; }
+  .btn { padding: 10px 20px; font-size: 0.8rem; }
+  .cursor-glow { display: none !important; }
+  .close-btn { top: 16px; right: 16px; background: rgba(255,255,255,0.1); border-radius: 50%; width: 32px; height: 32px; }
+
+  .playlist h2 {
+    min-height: auto;
+    height: auto;
+    font-size: 0.85rem;
+    font-weight: 500;
+    -webkit-line-clamp: 4;
+    margin-bottom: 6px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg"></div>
+<div class="noise"></div>
+<div class="wrap">
+
+  <header>
+    <h1>My Playlists</h1>
+    <p>by Manik Singh Mehra</p>
+  </header>
+
+  <section class="playlist-grid" id="playlist-container"></section>
+
+</div>
+
+<div class="cursor-glow" id="cursor-glow"></div>
+
+<div class="review-overlay" id="overlay">
+  <div class="review-window" id="review-window" role="dialog" aria-modal="true" aria-labelledby="rw-title" tabindex="-1">
+
+    <button class="close-btn" id="close-btn" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <div class="rw-grid">
+      <div class="rw-visual">
+        <img id="rw-img" src="" alt="Playlist Cover" draggable="false">
+      </div>
+
+      <div class="rw-content">
+        <h3 id="rw-title"></h3>
+        <div class="rw-creator" id="rw-creator"></div>
+        <div class="rw-text" id="rw-text"></div>
+
+        <div class="rw-actions">
+          <a href="#" class="btn primary" target="_blank" rel="noopener">Spotify</a>
+          <a href="#" class="btn secondary" target="_blank" rel="noopener">Apple Music</a>
+          <a href="#" class="btn youtube" target="_blank" rel="noopener">YouTube Music</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Playlist data - replace with your actual playlists
+const playlists = [
+  {
+    title: "Playlist Name 1",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1a1d24/ffffff?text=1",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Short description or mood.",
+    fullDescription: "A longer description about what this playlist contains, the mood, the vibe, and when you'd listen to it."
+  },
+  {
+    title: "Playlist Name 2",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/2a1d24/ffffff?text=2",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Another vibe here.",
+    fullDescription: "This playlist is perfect for those late night drives or early morning reflections."
+  },
+  {
+    title: "Playlist Name 3",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1a2d34/ffffff?text=3",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Chill and mellow.",
+    fullDescription: "A collection of tracks that help you unwind and relax after a long day."
+  },
+  {
+    title: "Playlist Name 4",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/3a1d14/ffffff?text=4",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "High energy vibes.",
+    fullDescription: "Get pumped up with these high-energy tracks perfect for workouts or when you need motivation."
+  },
+  {
+    title: "Playlist Name 5",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1a1d44/ffffff?text=5",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Nostalgic feels.",
+    fullDescription: "Songs that take you back to simpler times and remind you of beautiful memories."
+  },
+  {
+    title: "Playlist Name 6",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/4a1d24/ffffff?text=6",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Focus mode.",
+    fullDescription: "Instrumental and ambient tracks to help you concentrate and get work done."
+  },
+  {
+    title: "Playlist Name 7",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1d2a34/ffffff?text=7",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Late night vibes.",
+    fullDescription: "Perfect soundtrack for those quiet hours when the world is asleep."
+  },
+  {
+    title: "Playlist Name 8",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/2d1a24/ffffff?text=8",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Summer dreams.",
+    fullDescription: "Bright and warm tracks that capture the essence of summer days."
+  },
+  {
+    title: "Playlist Name 9",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/341d2a/ffffff?text=9",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Melancholic moods.",
+    fullDescription: "For when you need to sit with your feelings and let them flow."
+  },
+  {
+    title: "Playlist Name 10",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1a3d24/ffffff?text=10",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Road trip essentials.",
+    fullDescription: "The ultimate companion for long drives and adventures on the open road."
+  },
+  {
+    title: "Playlist Name 11",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/241d3a/ffffff?text=11",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Morning energy.",
+    fullDescription: "Start your day right with these uplifting and energizing tracks."
+  },
+  {
+    title: "Playlist Name 12",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/3a241d/ffffff?text=12",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Indie discoveries.",
+    fullDescription: "Hidden gems and underrated tracks from the indie scene."
+  },
+  {
+    title: "Playlist Name 13",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1d3a24/ffffff?text=13",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Deep focus.",
+    fullDescription: "Extended concentration sessions with minimal distractions."
+  },
+  {
+    title: "Playlist Name 14",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/241a3d/ffffff?text=14",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Acoustic sessions.",
+    fullDescription: "Stripped down, raw, and intimate acoustic performances."
+  },
+  {
+    title: "Playlist Name 15",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/2a1d34/ffffff?text=15",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Electronic dreams.",
+    fullDescription: "Synthesized soundscapes and electronic explorations."
+  },
+  {
+    title: "Playlist Name 16",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1d243a/ffffff?text=16",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Jazz lounge.",
+    fullDescription: "Smooth jazz and sophisticated grooves for any occasion."
+  },
+  {
+    title: "Playlist Name 17",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/341a2d/ffffff?text=17",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Rock classics.",
+    fullDescription: "Timeless rock anthems that never get old."
+  },
+  {
+    title: "Playlist Name 18",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/2d341a/ffffff?text=18",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Rainy day moods.",
+    fullDescription: "Perfect companions for grey skies and raindrops on windows."
+  },
+  {
+    title: "Playlist Name 19",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1a2d3d/ffffff?text=19",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Hip-hop essentials.",
+    fullDescription: "The beats and rhymes that shaped the culture."
+  },
+  {
+    title: "Playlist Name 20",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/3d1a2d/ffffff?text=20",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Pop perfection.",
+    fullDescription: "Irresistible pop hooks and singalong moments."
+  },
+  {
+    title: "Playlist Name 21",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/2d1a3d/ffffff?text=21",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Soul food.",
+    fullDescription: "Rich, emotional soul music that feeds the spirit."
+  },
+  {
+    title: "Playlist Name 22",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1d3d2a/ffffff?text=22",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Bedroom pop.",
+    fullDescription: "Intimate, lo-fi productions that feel like secrets."
+  },
+  {
+    title: "Playlist Name 23",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/3d2d1a/ffffff?text=23",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Alternative edge.",
+    fullDescription: "Bold and unconventional tracks that challenge the mainstream."
+  },
+  {
+    title: "Playlist Name 24",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1a3d3d/ffffff?text=24",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Study marathon.",
+    fullDescription: "Hours of focus-friendly music for intense study sessions."
+  },
+  {
+    title: "Playlist Name 25",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/3d1a3d/ffffff?text=25",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Sunset sessions.",
+    fullDescription: "Golden hour soundtrack for watching the day fade away."
+  },
+  {
+    title: "Playlist Name 26",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/2a3d1a/ffffff?text=26",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "R&B smooth.",
+    fullDescription: "Silky R&B grooves that set the mood perfectly."
+  },
+  {
+    title: "Playlist Name 27",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1a2a3d/ffffff?text=27",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Party starters.",
+    fullDescription: "High-energy bangers to get any gathering moving."
+  },
+  {
+    title: "Playlist Name 28",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/3d2a1a/ffffff?text=28",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Folk tales.",
+    fullDescription: "Storytelling through folk melodies and acoustic warmth."
+  },
+  {
+    title: "Playlist Name 29",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1d2a3d/ffffff?text=29",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Punk energy.",
+    fullDescription: "Raw, rebellious, and unapologetically loud."
+  },
+  {
+    title: "Playlist Name 30",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/3d1d2a/ffffff?text=30",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Dream pop.",
+    fullDescription: "Ethereal soundscapes and dreamy vocals."
+  },
+  {
+    title: "Playlist Name 31",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/2a1d3d/ffffff?text=31",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Classical moments.",
+    fullDescription: "Timeless orchestral pieces for reflection and peace."
+  },
+  {
+    title: "Playlist Name 32",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1a3d2d/ffffff?text=32",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Tropical escape.",
+    fullDescription: "Beach vibes and island rhythms for mental getaways."
+  },
+  {
+    title: "Playlist Name 33",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/3d2a2d/ffffff?text=33",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Metal madness.",
+    fullDescription: "Heavy riffs and thunderous drums for maximum intensity."
+  },
+  {
+    title: "Playlist Name 34",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/2d3d1a/ffffff?text=34",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Ambient spaces.",
+    fullDescription: "Minimalist soundscapes for meditation and calm."
+  },
+  {
+    title: "Playlist Name 35",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1d3d3d/ffffff?text=35",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Country roads.",
+    fullDescription: "Heartfelt country tunes about life, love, and loss."
+  },
+  {
+    title: "Playlist Name 36",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/3d1d3d/ffffff?text=36",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Dance floor.",
+    fullDescription: "Non-stop dance tracks that keep you moving all night."
+  },
+  {
+    title: "Playlist Name 37",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/2d1d3d/ffffff?text=37",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Shoegaze waves.",
+    fullDescription: "Wall of sound and reverb-drenched guitars."
+  },
+  {
+    title: "Playlist Name 38",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1d2d3d/ffffff?text=38",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Blues roots.",
+    fullDescription: "Deep blues that speak to the soul."
+  },
+  {
+    title: "Playlist Name 39",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/3d2d2d/ffffff?text=39",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Experimental sounds.",
+    fullDescription: "Boundary-pushing tracks that defy genre conventions."
+  },
+  {
+    title: "Playlist Name 40",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/2d3d2d/ffffff?text=40",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Morning coffee.",
+    fullDescription: "Gentle tracks to sip your coffee to."
+  },
+  {
+    title: "Playlist Name 41",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1d3d2d/ffffff?text=41",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Workout pump.",
+    fullDescription: "Intense beats to push through your toughest workouts."
+  },
+  {
+    title: "Playlist Name 42",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/3d2d3d/ffffff?text=42",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Synth wave.",
+    fullDescription: "Retro-futuristic synths and neon dreams."
+  },
+  {
+    title: "Playlist Name 43",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/2d2d3d/ffffff?text=43",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Gospel joy.",
+    fullDescription: "Uplifting gospel music full of hope and celebration."
+  },
+  {
+    title: "Playlist Name 44",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/1d2d2d/ffffff?text=44",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Grunge revival.",
+    fullDescription: "Raw 90s energy and angst-filled anthems."
+  },
+  {
+    title: "Playlist Name 45",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/3d3d2d/ffffff?text=45",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Reggae rhythms.",
+    fullDescription: "Island grooves and positive vibrations."
+  },
+  {
+    title: "Playlist Name 46",
+    creator: "Manik Singh Mehra",
+    cover: "https://via.placeholder.com/300x300/2d3d3d/ffffff?text=46",
+    spotify: "https://open.spotify.com/playlist/YOUR_PLAYLIST_ID",
+    apple: "https://music.apple.com/playlist/YOUR_PLAYLIST_ID",
+    youtube: "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID",
+    description: "Piano moments.",
+    fullDescription: "Beautiful piano pieces for quiet contemplation."
+  },
+  {
+    title: "all the good drugs are here",
+    creator: "Manik Singh Mehra",
+    cover: "all-the-good-drugs-are-here.jpg",
+    spotify: "https://open.spotify.com/playlist/7mIkeN4Mbs92FQ2qYD6uQZ?si=2acad98062c44163",
+    apple: "https://music.apple.com/in/playlist/all-the-good-drugs-are-here/pl.u-PDb45e5Ieb5v89E",
+    youtube: "https://music.youtube.com/playlist?list=PLCv99FeWkkeg&si=AtejHWta8P-O5ImF",
+    description: "House party.",
+    fullDescription: "Four-on-the-floor beats to keep the party going."
+  },
+  {
+    title: "Yahaan se bahut door, galat aur sahi ke paar, ek jagah hai waha mai moot ta milunga",
+    creator: "Manik Singh Mehra",
+    cover: "yahaan-se-bahut-door-galat-aur-sahi-ke-paar-ek-jagah-hai-waha-mai-moot-ta-milunga.jpg",
+    spotify: "https://open.spotify.com/playlist/4PMrfxothheOXqn1u2mfy8?si=b2d374c8f8254df0",
+    apple: "https://music.apple.com/in/playlist/yahaan-se-bahut-door-galat-aur-sahi-ke-paar-ek-jagah/pl.u-vxy6L93TWeqbMAp",
+    youtube: "https://music.youtube.com/playlist?list=PLKKRUjVTCMSs&si=7j4DlOUVuKTgi0n8",
+    description: "Techno underground.",
+    fullDescription: "Dark, hypnotic techno for late night sessions."
+  },
+  {
+    title: "fuck, Aaj mai kitna dino baad nahunga",
+    creator: "Manik Singh Mehra",
+    cover: "fuck-aaj-mai-kitna-dino-baad-nahunga.jpg",
+    spotify: "https://open.spotify.com/playlist/4MTVj5noH0IApFEhHBIKxJ?si=471662b294e9427f",
+    apple: "https://music.apple.com/in/playlist/fuck-aaj-mai-kitna-dino-baad-nahunga/pl.u-PDb4oADueb5v89E",
+    youtube: "https://music.youtube.com/playlist?list=PLHWBvO3vgKy8&si=HsUIraFCxGgb5PCE",
+    description: "Bossa nova.",
+    fullDescription: "Smooth Brazilian rhythms and laid-back vibes."
+  },
+  {
+    title: "constellations ",
+    creator: "Manik Singh Mehra",
+    cover: "constellations.jpg",
+    spotify: "https://open.spotify.com/playlist/0hG5r4d1dFx27D3B3mqnqV?si=3d6eaa12506c4d2b",
+    apple: "https://music.apple.com/in/playlist/constellations/pl.u-vxy6La6IWeqbMAp",
+    youtube: "https://music.youtube.com/playlist?list=PLQ3QeC0fmyyk&si=1hwzYDhKRRhYeSSF",
+    description: "Post-rock journeys.",
+    fullDescription: "Epic instrumental buildups and emotional crescendos."
+  },
+  {
+    title: "God sees me in his eyes",
+    creator: "Manik Singh Mehra",
+    cover: "god-sees-me-in-his-eyes.jpg",
+    spotify: "https://open.spotify.com/playlist/0knsCTpru4Y18rkgc49Tdx?si=1fb701d799794aad",
+    apple: "https://music.apple.com/in/playlist/god-sees-me-in-his-eyes/pl.u-ZmblK0oiVM67gom",
+    youtube: "https://music.youtube.com/playlist?list=PLfue7yhnzaLg&si=HjNZtHLBAb-JVMNQ",
+    description: "Hip-hop classics.",
+    fullDescription: "Hip-hop featuring Kanye West, Nas, Wu-Tang Clan, A$AP Rocky, Joey Bada$$, Travis Scott, Madvillain, Tyler, The Creator, Freddie Gibbs, The Alchemist, and André 3000."
+  },
+  {
+    title: "Watch your step kid",
+    creator: "Manik Singh Mehra",
+    cover: "watch-your-step-kid.jpg",
+    spotify: "https://open.spotify.com/playlist/3SthpNhIjKY080BNWqhKPX?si=13d4ca7be40d47a3",
+    apple: "https://music.apple.com/in/playlist/watch-your-step-kid/pl.u-Ymb0ojMug5mRV9E",
+    youtube: "https://music.youtube.com/playlist?list=PLLqssgYGhPJ0&si=1POfTHF2ZdAfrAc2",
+    description: "Hip-hop essentials.",
+    fullDescription: "Classic hip-hop featuring Nas, Wu-Tang Clan, Notorious B.I.G., A$AP Rocky, Joey Bada$$, Outkast, and MF DOOM."
+  },
+  {
+    title: "I do Claire bear",
+    creator: "Manik Singh Mehra",
+    cover: "i-do-claire-bear.jpg",
+    spotify: "https://open.spotify.com/playlist/4LxLLRjHv8wYjER1HPe9uw?si=c80bdc22b0a84b9e",
+    apple: "https://music.apple.com/in/playlist/i-do-claire-bear/pl.u-b3b8KVeCKplM4q8",
+    youtube: "https://music.youtube.com/playlist?list=PLZv3sXbJiuK8&si=wvh87WgIKv1HnDSJ",
+    description: "A playlist with Arham.",
+    fullDescription: "A playlist made together with Arham."
+  },
+  {
+    title: "₹1M/unsuna undekha",
+    creator: "Manik Singh Mehra",
+    cover: "1m-unsuna-undekha.jpg",
+    spotify: "https://open.spotify.com/playlist/1RjSvZXg7XPxnAJFoWyJKq?si=7fceff9e11af4f7e",
+    apple: "https://music.apple.com/in/playlist/₹1m-unsuna-undekha/pl.u-AkAmeb3Hx9d5P4Z",
+    youtube: "https://music.youtube.com/playlist?list=PLIU64U_qP9lE&si=h1CUhpc2syYlRZJJ",
+    description: "World fusion.",
+    fullDescription: "Global sounds blending cultures and traditions."
+  }
+];
+
+const defaultYoutubePlaylistUrl = "https://music.youtube.com/playlist?list=YOUR_PLAYLIST_ID";
+playlists.forEach(playlist => {
+  if (!playlist.youtube) {
+    playlist.youtube = defaultYoutubePlaylistUrl;
+  }
+});
+
+const savedPlaylistsKey = "manik-playlists";
+const savedPlaylists = JSON.parse(localStorage.getItem(savedPlaylistsKey) || "[]");
+if (Array.isArray(savedPlaylists)) {
+  savedPlaylists.forEach(savedPlaylist => {
+    if (Number.isInteger(savedPlaylist.slotIndex) && playlists[savedPlaylist.slotIndex]) {
+      const { slotIndex, ...playlist } = savedPlaylist;
+      playlists[slotIndex] = playlist;
+    } else {
+      playlists.push(savedPlaylist);
+    }
+  });
+}
+
+const escapeHtml = (value) => String(value)
+  .replaceAll("&", "&amp;")
+  .replaceAll("<", "&lt;")
+  .replaceAll(">", "&gt;")
+  .replaceAll('"', "&quot;")
+  .replaceAll("'", "&#039;");
+
+const createPlaylistCard = (playlist) => {
+  const article = document.createElement('article');
+  article.className = 'playlist';
+  article.tabIndex = 0;
+  article.setAttribute('role', 'button');
+
+  article.dataset.title = playlist.title;
+  article.dataset.creator = playlist.creator;
+  article.dataset.description = playlist.fullDescription;
+  article.dataset.spotify = playlist.spotify || "#";
+  article.dataset.apple = playlist.apple || "#";
+  article.dataset.youtube = playlist.youtube || "#";
+
+  article.innerHTML = `
+    <div class="playlist-inner">
+      <div class="glare"></div>
+      <div class="playlist-art" style="background-image: url('${escapeHtml(playlist.cover)}');"></div>
+      <h2>${escapeHtml(playlist.title)}</h2>
+      <div class="creator">${escapeHtml(playlist.creator)}</div>
+      <div class="description">${escapeHtml(playlist.description)}</div>
+    </div>
+  `;
+  return article;
+};
+
+const renderPlaylists = () => {
+  const container = document.getElementById('playlist-container');
+  container.replaceChildren();
+  playlists.forEach(playlist => {
+    const card = createPlaylistCard(playlist);
+    container.appendChild(card);
+  });
+};
+
+renderPlaylists();
+
+const overlay = document.getElementById('overlay');
+const closeBtn = document.getElementById('close-btn');
+const windowEl = document.getElementById('review-window');
+const titleEl = document.getElementById('rw-title');
+const creatorEl = document.getElementById('rw-creator');
+const textEl = document.getElementById('rw-text');
+const spotifyBtn = document.querySelector('.btn.primary');
+const appleBtn = document.querySelector('.btn.secondary');
+const youtubeBtn = document.querySelector('.btn.youtube');
+const rwImg = document.getElementById('rw-img');
+let lastFocusedElement;
+
+const openModal = (playlist) => {
+  lastFocusedElement = playlist;
+
+  titleEl.textContent = playlist.dataset.title;
+  creatorEl.textContent = playlist.dataset.creator;
+  textEl.innerHTML = playlist.dataset.description;
+
+  const cardArtDiv = playlist.querySelector('.playlist-art');
+  const bgImageStyle = cardArtDiv.style.backgroundImage;
+  const bgUrl = bgImageStyle.slice(5, -2);
+
+  rwImg.src = bgUrl || "";
+
+  spotifyBtn.href = playlist.dataset.spotify || '#';
+  appleBtn.href = playlist.dataset.apple || '#';
+  youtubeBtn.href = playlist.dataset.youtube || '#';
+
+  windowEl.scrollTop = 0;
+
+  overlay.classList.add('active');
+  document.body.classList.add('window-open');
+
+  setTimeout(() => closeBtn.focus(), 50);
+};
+
+const closePanel = () => {
+  overlay.classList.remove('active');
+  document.body.classList.remove('window-open');
+  if (lastFocusedElement) lastFocusedElement.focus();
+};
+
+const trapFocus = (e) => {
+  if (!overlay.classList.contains('active')) return;
+
+  const focusableElements = windowEl.querySelectorAll(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  );
+  const firstElement = focusableElements[0];
+  const lastElement = focusableElements[focusableElements.length - 1];
+
+  if (e.key === 'Tab') {
+    if (e.shiftKey) {
+      if (document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement.focus();
+      }
+    } else {
+      if (document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement.focus();
+      }
+    }
+  }
+};
+
+document.addEventListener('click', (e) => {
+  const playlist = e.target.closest('.playlist');
+  if (playlist) openModal(playlist);
+});
+
+document.addEventListener('keydown', (e) => {
+  const playlist = e.target.closest('.playlist');
+  if (playlist && (e.key === 'Enter' || e.key === ' ')) {
+    e.preventDefault();
+    openModal(playlist);
+  }
+
+  if (overlay.classList.contains('active')) {
+      if(e.key === 'Escape') closePanel();
+      trapFocus(e);
+  }
+});
+
+closeBtn.addEventListener('click', closePanel);
+overlay.addEventListener('click', e => {
+  if(e.target === overlay) closePanel();
+});
+
+const isDesktop = window.matchMedia("(min-width: 769px) and (hover: hover)").matches;
+
+if (isDesktop) {
+    const cursor = document.getElementById('cursor-glow');
+    let mouseX = 0, mouseY = 0;
+    let currentX = 0, currentY = 0;
+    let isCursorTicking = false;
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        if (!isCursorTicking) {
+            window.requestAnimationFrame(animateCursor);
+            isCursorTicking = true;
+        }
+    });
+
+    const animateCursor = () => {
+        currentX += (mouseX - currentX) * 0.15;
+        currentY += (mouseY - currentY) * 0.15;
+
+        if (cursor) {
+           cursor.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+        }
+
+        if (Math.abs(mouseX - currentX) > 0.1 || Math.abs(mouseY - currentY) > 0.1) {
+             window.requestAnimationFrame(animateCursor);
+        } else {
+             isCursorTicking = false;
+        }
+    };
+
+    const cards = document.querySelectorAll('.playlist');
+
+    cards.forEach(card => {
+        let bounds;
+        const inner = card.querySelector('.playlist-inner');
+        const glare = card.querySelector('.glare');
+        const art = card.querySelector('.playlist-art');
+        const textElements = card.querySelectorAll('h2, .creator, .description');
+        let cardTicking = false;
+        let cardMouseX = 0;
+        let cardMouseY = 0;
+
+        const updateTilt = () => {
+            if (!bounds) {
+                cardTicking = false;
+                return;
+            }
+
+            const x = cardMouseX - bounds.left;
+            const y = cardMouseY - bounds.top;
+
+            const xRotation = -((y - bounds.height / 2) / 10);
+            const yRotation = ((x - bounds.width / 2) / 10);
+
+            inner.style.transform = `perspective(1000px) rotateX(${xRotation}deg) rotateY(${yRotation}deg) translateY(-5px)`;
+
+            if(glare) {
+                const glareX = (x / bounds.width) * 100;
+                const glareY = (y / bounds.height) * 100;
+                glare.style.background = `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.25), transparent 50%)`;
+            }
+
+            if(art) art.style.transform = `translateZ(30px) scale(1.02)`;
+            textElements.forEach(el => el.style.transform = `translateZ(20px)`);
+
+            cardTicking = false;
+        };
+
+        card.addEventListener('mouseenter', () => {
+            bounds = card.getBoundingClientRect();
+            inner.style.willChange = 'transform';
+        });
+
+        card.addEventListener('mousemove', (e) => {
+            cardMouseX = e.clientX;
+            cardMouseY = e.clientY;
+
+            if (!cardTicking) {
+                window.requestAnimationFrame(updateTilt);
+                cardTicking = true;
+            }
+        });
+
+        card.addEventListener('mouseleave', () => {
+            inner.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+            inner.style.willChange = 'auto';
+            if(art) art.style.transform = 'translateZ(0) scale(1)';
+            textElements.forEach(el => el.style.transform = 'translateZ(0)');
+            bounds = null;
+            cardTicking = false;
+        });
+    });
+
+} else {
+    const cursor = document.getElementById('cursor-glow');
+    if(cursor) cursor.style.display = 'none';
+}
+
+document.addEventListener('click', function(e) {
+  const card = e.target.closest('.playlist');
+  if (card) {
+    if (navigator.vibrate) navigator.vibrate(8);
+    const inner = card.querySelector('.playlist-inner');
+    const rect = inner.getBoundingClientRect();
+    const circle = document.createElement('span');
+    const diameter = Math.max(rect.width, rect.height);
+    const radius = diameter / 2;
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${e.clientX - rect.left - radius}px`;
+    circle.style.top = `${e.clientY - rect.top - radius}px`;
+    circle.classList.add('ripple');
+    const existing = inner.getElementsByClassName('ripple')[0];
+    if (existing) existing.remove();
+    inner.appendChild(circle);
+  }
+});
+</script>
+
+</body>
+
+</html>

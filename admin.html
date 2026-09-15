@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playlist Admin</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, Arial, sans-serif;
+      background: #0b0d10;
+      color: #eaeaea;
+    }
+
+    body {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    h1 { margin-bottom: 8px; }
+    p { color: rgba(234, 234, 234, .65); }
+
+    form {
+      display: grid;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: .85rem;
+      color: rgba(234, 234, 234, .8);
+    }
+
+    input, textarea, button {
+      font: inherit;
+      border: 1px solid rgba(255, 255, 255, .16);
+      border-radius: 8px;
+      padding: 11px 12px;
+    }
+
+    input, textarea {
+      color: #fff;
+      background: rgba(255, 255, 255, .07);
+    }
+
+    textarea { min-height: 90px; resize: vertical; }
+
+    button {
+      color: #fff;
+      background: #3d526b;
+      cursor: pointer;
+    }
+
+    button:hover { filter: brightness(1.2); }
+
+    .links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    .links a { color: #b7d7ff; }
+    #status { min-height: 1.5em; color: #9fdbad; }
+    #saved-list { padding-left: 20px; }
+    #saved-list li { margin: 10px 0; }
+    #saved-list button { margin-left: 8px; padding: 5px 9px; }
+  </style>
+</head>
+<body>
+  <h1>Playlist Admin</h1>
+  <p>Fill in the playlist details and choose a cover image. Saving publishes the playlist to the live site.</p>
+
+  <form id="playlist-form">
+    <label>Title
+      <input name="title" required>
+    </label>
+    <label>Creator
+      <input name="creator" value="Manik Singh Mehra" required>
+    </label>
+    <label>Admin password
+      <input name="adminPassword" type="password" required>
+    </label>
+    <label>Cover image
+      <input name="coverFile" type="file" accept="image/jpeg,image/png,image/webp" required>
+    </label>
+    <label>Spotify link
+      <input name="spotify" type="url" placeholder="https://open.spotify.com/playlist/...">
+    </label>
+    <label>Apple Music link
+      <input name="apple" type="url" placeholder="https://music.apple.com/...">
+    </label>
+    <label>YouTube Music link
+      <input name="youtube" type="url" placeholder="https://music.youtube.com/playlist?...">
+    </label>
+    <label>Short description
+      <textarea name="description" required></textarea>
+    </label>
+    <label>Full description
+      <textarea name="fullDescription" required></textarea>
+    </label>
+    <button type="submit">Add playlist to my site</button>
+  </form>
+
+  <p id="status" role="status"></p>
+  <h2>Added playlists</h2>
+  <ul id="saved-list"></ul>
+  <div class="links">
+    <a href="index.html">Open main playlist site</a>
+  </div>
+
+  <script>
+    const form = document.getElementById("playlist-form");
+    const status = document.getElementById("status");
+    const savedList = document.getElementById("saved-list");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const file = form.elements.coverFile.files[0];
+      if (!file) {
+        status.textContent = "Choose a cover image.";
+        return;
+      }
+
+      try {
+        const coverData = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result).split(",")[1]);
+          reader.onerror = () => reject(new Error("Could not read cover image."));
+          reader.readAsDataURL(file);
+        });
+        const values = Object.fromEntries(new FormData(form));
+        const adminPassword = values.adminPassword;
+        delete values.adminPassword;
+        delete values.coverFile;
+        const response = await fetch("/api/publish", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ playlist: values, image: coverData, imageType: file.type, adminPassword })
+        });
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({}));
+          throw new Error(error.error || `Publish failed (${response.status})`);
+        }
+
+        const playlist = await response.json();
+        form.reset();
+        form.elements.creator.value = "Manik Singh Mehra";
+        status.textContent = `Published ${playlist.title}. Vercel will deploy the update shortly.`;
+        savedList.innerHTML = `<li>${playlist.title} (${playlist.cover})</li>`;
+      } catch (error) {
+        status.textContent = error.message;
+      }
+    });
+  </script>
+</body>
+</html>
