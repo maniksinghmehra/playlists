@@ -37,6 +37,27 @@ const commitFile = async (path, content, message, sha) => github(path, {
   body: JSON.stringify({ message, content, branch: BRANCH, ...(sha ? { sha } : {}) })
 });
 
+const updateIndex = async (object, title) => {
+  const placeholder = /  \{\s*title:\s*"Playlist Name \d+"[\s\S]*?\n  \},?/g;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const matches = [...indexFile.text.matchAll(placeholder)];
+    let updatedIndex = indexFile.text;
+    if (matches.length > 0) {
+      const match = matches[matches.length - 1];
+      updatedIndex = `${indexFile.text.slice(0, match.index)}${object}${indexFile.text.slice(match.index + match[0].length)}`;
+    } else {
+      updatedIndex = indexFile.text.replace(/\n\];\s*\n\nconst defaultYoutubePlaylistUrl/, `\n${object}\n];\n\nconst defaultYoutubePlaylistUrl`);
+    }
+    if (updatedIndex === indexFile.text) throw new Error("Could not find the playlist array in index.html.");
+    try {
+      await commitFile("index.html", Buffer.from(updatedIndex).toString("base64"), `Add playlist ${title}`, indexFile.sha);
+      return;
+    } catch (error) {
+      if (!String(error.message).includes("is at") || attempt === 2) throw error;
+    }
+  }
+};
+
 const getFile = async path => {
   try {
     const file = await github(path);
@@ -79,20 +100,9 @@ module.exports = async (req, res) => {
     const cover = `${slugify(playlist.title)}${extension}`;
     const indexFile = await getFile("index.html");
     const object = `  {\n    title: ${JSON.stringify(playlist.title)},\n    creator: ${JSON.stringify(playlist.creator)},\n    cover: ${JSON.stringify(cover)},\n    spotify: ${JSON.stringify(playlist.spotify || "")},\n    apple: ${JSON.stringify(playlist.apple || "")},\n    youtube: ${JSON.stringify(playlist.youtube || "")},\n    description: ${JSON.stringify(playlist.description || "")},\n    fullDescription: ${JSON.stringify(playlist.fullDescription || "")}\n  },`;
-    const placeholder = /  \{\s*title:\s*"Playlist Name \d+"[\s\S]*?\n  \},?/g;
-    const matches = [...indexFile.text.matchAll(placeholder)];
-    let updatedIndex = indexFile.text;
-    if (matches.length > 0) {
-      const match = matches[matches.length - 1];
-      updatedIndex = `${indexFile.text.slice(0, match.index)}${object}${indexFile.text.slice(match.index + match[0].length)}`;
-    } else {
-      updatedIndex = indexFile.text.replace(/\n\];\s*\n\nconst defaultYoutubePlaylistUrl/, `\n${object}\n];\n\nconst defaultYoutubePlaylistUrl`);
-    }
-    if (updatedIndex === indexFile.text) throw new Error("Could not find the playlist array in index.html.");
-
     const existingCover = await getFile(cover);
     await commitFile(cover, image, `Add cover for ${playlist.title}`, existingCover.sha);
-    await commitFile("index.html", Buffer.from(updatedIndex).toString("base64"), `Add playlist ${playlist.title}`, indexFile.sha);
+    await updateIndex(object, playlist.title);
     res.status(200).json({ ...playlist, cover });
   } catch (error) {
     res.status(400).json({ error: error.message });
