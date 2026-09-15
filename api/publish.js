@@ -71,33 +71,33 @@ const getFile = async path => {
       text: Buffer.from(file.content, "base64").toString("utf8"),
       sha: file.sha
     };
-
-    const readPlaylists = text => {
-      const records = [];
-      const objectPattern = /  \{\s*title:\s*("[^"]*(?:\\.[^"]*)*")[\s\S]*?\n  \},?/g;
-      for (const match of text.matchAll(objectPattern)) {
-        const block = match[0];
-        const value = field => {
-          const fieldMatch = block.match(new RegExp(`\\n    ${field}:\\s*("[^"]*(?:\\\\.[^"]*)*")`));
-          return fieldMatch ? JSON.parse(fieldMatch[1]) : "";
-        };
-        records.push({
-          title: JSON.parse(match[1]),
-          creator: value("creator"),
-          cover: value("cover"),
-          spotify: value("spotify"),
-          apple: value("apple"),
-          youtube: value("youtube"),
-          description: value("description"),
-          fullDescription: value("fullDescription")
-        });
-      }
-      return records;
-    };
   } catch (error) {
     if (error.message.includes("Not Found")) return { text: "", sha: undefined };
     throw error;
   }
+};
+
+const readPlaylists = text => {
+  const records = [];
+  const objectPattern = /  \{\s*title:\s*("[^"]*(?:\\.[^"]*)*")[\s\S]*?\n  \},?/g;
+  for (const match of text.matchAll(objectPattern)) {
+    const block = match[0];
+    const value = field => {
+      const fieldMatch = block.match(new RegExp(`\\n    ${field}:\\s*("[^"]*(?:\\\\.[^"]*)*")`));
+      return fieldMatch ? JSON.parse(fieldMatch[1]) : "";
+    };
+    records.push({
+      title: JSON.parse(match[1]),
+      creator: value("creator"),
+      cover: value("cover"),
+      spotify: value("spotify"),
+      apple: value("apple"),
+      youtube: value("youtube"),
+      description: value("description"),
+      fullDescription: value("fullDescription")
+    });
+  }
+  return records;
 };
 
 module.exports = async (req, res) => {
