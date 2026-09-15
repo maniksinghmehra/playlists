@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <meta property="og:image" content="playlist-cover.png">
 <meta property="og:title" content="My Playlists — Manik Singh Mehra">
@@ -28,6 +28,7 @@
   --font: 'Inter', sans-serif;
   --serif: 'Lora', serif;
   --card-width: 260px;
+  -webkit-text-size-adjust: 100%;
 }
 
 * {
@@ -57,6 +58,10 @@ body.window-open {
   overflow: hidden;
   touch-action: none;
   padding-right: 10px;
+}
+
+button, a, .playlist {
+  touch-action: manipulation;
 }
 
 ::-webkit-scrollbar { width: 10px; }
@@ -552,7 +557,34 @@ Stop-Process -Id 17584.review-overlay.active .rw-actions { transition-delay: 0.5
 }
 
 @media (max-width: 768px) {
-  .wrap { padding: 40px 20px 80px; }
+  body.window-open { padding-right: 0; }
+
+  .wrap {
+    padding: max(40px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+      max(80px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  }
+
+  header {
+    margin-bottom: 42px;
+    padding: 0 48px;
+  }
+
+  header h1 {
+    font-size: clamp(1.55rem, 7vw, 2rem);
+  }
+
+  header p {
+    font-size: .62rem;
+    letter-spacing: .18em;
+    line-height: 1.5;
+  }
+
+  .admin-link {
+    top: max(14px, env(safe-area-inset-top));
+    right: max(14px, env(safe-area-inset-right));
+    width: 46px;
+    height: 46px;
+  }
 
   .playlist-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -574,7 +606,7 @@ Stop-Process -Id 17584.review-overlay.active .rw-actions { transition-delay: 0.5
     border: 1px solid rgba(255,255,255,0.15);
     width: 96vw !important;
     height: auto;
-    max-height: 85vh;
+    max-height: 85svh;
     padding: 24px 20px 80px 20px !important;
     border-radius: 20px;
     top: 50% !important;
@@ -627,7 +659,12 @@ Stop-Process -Id 17584.review-overlay.active .rw-actions { transition-delay: 0.5
   }
 
   .rw-actions { justify-content: center; margin-top: 36px; }
-  .btn { padding: 10px 20px; font-size: 0.8rem; }
+  .btn {
+    flex: 1 1 130px;
+    min-height: 44px;
+    padding: 10px 16px;
+    font-size: 0.8rem;
+  }
   .cursor-glow { display: none !important; }
   .close-btn { top: 16px; right: 16px; background: rgba(255,255,255,0.1); border-radius: 50%; width: 32px; height: 32px; }
 
@@ -638,6 +675,54 @@ Stop-Process -Id 17584.review-overlay.active .rw-actions { transition-delay: 0.5
     font-weight: 500;
     -webkit-line-clamp: 4;
     margin-bottom: 6px;
+  }
+}
+
+@media (max-width: 420px) {
+  .playlist-grid {
+    gap: 12px;
+  }
+
+  .playlist-inner {
+    padding: 10px;
+    border-radius: 9px;
+  }
+
+  .playlist-art {
+    border-radius: 9px;
+    margin-bottom: 10px;
+  }
+
+  .playlist h2 {
+    font-size: .8rem;
+    line-height: 1.3;
+  }
+
+  .playlist .creator,
+  .playlist .description {
+    font-size: .72rem;
+  }
+
+  .review-window {
+    width: calc(100vw - 24px) !important;
+    padding: 22px 16px 64px !important;
+  }
+
+  .rw-visual,
+  .rw-visual img {
+    width: 112px !important;
+    height: 112px !important;
+    max-width: 112px !important;
+    max-height: 112px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
   }
 }
 </style>
