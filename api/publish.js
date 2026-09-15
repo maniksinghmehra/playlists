@@ -40,6 +40,7 @@ const commitFile = async (path, content, message, sha) => github(path, {
 const updateIndex = async (object, title) => {
   const placeholder = /  \{\s*title:\s*"Playlist Name \d+"[\s\S]*?\n  \},?/g;
   for (let attempt = 0; attempt < 3; attempt += 1) {
+    const indexFile = await getFile("index.html");
     const matches = [...indexFile.text.matchAll(placeholder)];
     let updatedIndex = indexFile.text;
     if (matches.length > 0) {
@@ -98,7 +99,6 @@ module.exports = async (req, res) => {
     if (!playlist || !playlist.title || !image) throw new Error("Playlist title and cover image are required.");
     const extension = imageType === "image/png" ? ".png" : imageType === "image/webp" ? ".webp" : ".jpg";
     const cover = `${slugify(playlist.title)}${extension}`;
-    const indexFile = await getFile("index.html");
     const object = `  {\n    title: ${JSON.stringify(playlist.title)},\n    creator: ${JSON.stringify(playlist.creator)},\n    cover: ${JSON.stringify(cover)},\n    spotify: ${JSON.stringify(playlist.spotify || "")},\n    apple: ${JSON.stringify(playlist.apple || "")},\n    youtube: ${JSON.stringify(playlist.youtube || "")},\n    description: ${JSON.stringify(playlist.description || "")},\n    fullDescription: ${JSON.stringify(playlist.fullDescription || "")}\n  },`;
     const existingCover = await getFile(cover);
     await commitFile(cover, image, `Add cover for ${playlist.title}`, existingCover.sha);
