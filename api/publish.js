@@ -79,7 +79,7 @@ module.exports = async (req, res) => {
     const cover = `${slugify(playlist.title)}${extension}`;
     const indexFile = await getFile("index.html");
     const object = `  {\n    title: ${JSON.stringify(playlist.title)},\n    creator: ${JSON.stringify(playlist.creator)},\n    cover: ${JSON.stringify(cover)},\n    spotify: ${JSON.stringify(playlist.spotify || "")},\n    apple: ${JSON.stringify(playlist.apple || "")},\n    youtube: ${JSON.stringify(playlist.youtube || "")},\n    description: ${JSON.stringify(playlist.description || "")},\n    fullDescription: ${JSON.stringify(playlist.fullDescription || "")}\n  },`;
-    const placeholder = /  \{\s*title:\s*"Playlist Name \d+"[\s\S]*?\n  \},?/;
+    const placeholder = /  \{\s*title:\s*"Playlist Name \d+"[\s\S]*?\n  \},?/g;
     const matches = [...indexFile.text.matchAll(placeholder)];
     let updatedIndex = indexFile.text;
     if (matches.length > 0) {
