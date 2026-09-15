@@ -2,7 +2,7 @@ const OWNER = process.env.GITHUB_OWNER || "maniksinghmehra";
 const REPO = process.env.GITHUB_REPO || "playlists";
 const BRANCH = process.env.GITHUB_BRANCH || "main";
 const API = "https://api.github.com";
-const configuredPassword = () => process.env.pass || process.env.ADMIN_PASSWORD;
+const configuredPassword = () => process.env.Pass || process.env.pass || process.env.ADMIN_PASSWORD;
 const normalizePassword = value => {
   const password = String(value || "").trim();
   return password.length >= 2 && /^(['"]).*\1$/.test(password)
