@@ -100,6 +100,50 @@
 
     button:hover { filter: brightness(1.2); }
     button:disabled { opacity: .65; cursor: wait; }
+    .submit-button {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      overflow: hidden;
+      transition: background .2s ease, transform .2s ease, opacity .2s ease;
+    }
+
+    .submit-button:not(:disabled):active {
+      transform: scale(.985);
+    }
+
+    .submit-button.is-loading {
+      background: #526f93;
+    }
+
+    .submit-button.is-success {
+      background: #28734f;
+    }
+
+    .submit-spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, .35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: submit-spin .7s linear infinite;
+    }
+
+    @keyframes submit-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .submit-spinner { animation: none; }
+    }
+
+    .submit-button.is-loading .submit-spinner {
+      display: inline-block;
+    }
+
     input:focus-visible, textarea:focus-visible, button:focus-visible {
       outline: 2px solid #b7d7ff;
       outline-offset: 2px;
@@ -186,7 +230,10 @@
         <label>Full description
           <textarea name="fullDescription" required></textarea>
         </label>
-        <button type="submit">Add playlist to my site</button>
+        <button class="submit-button" id="submit-button" type="submit">
+          <span class="submit-spinner" aria-hidden="true"></span>
+          <span class="submit-label">Add playlist to my site</span>
+        </button>
       </form>
 
       <p id="status" role="status"></p>
@@ -207,6 +254,8 @@
     const loginButton = document.getElementById("login-button");
     const loginStatus = document.getElementById("login-status");
     const adminShell = document.getElementById("admin-shell");
+    const submitButton = document.getElementById("submit-button");
+    const submitLabel = submitButton.querySelector(".submit-label");
     const passwordStorageKey = "playlist-admin-password";
 
     const showAdminPage = () => {
@@ -296,6 +345,9 @@
       }
 
       try {
+        submitButton.disabled = true;
+        submitButton.classList.add("is-loading");
+        submitLabel.textContent = "Publishing playlist...";
         const coverData = await new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(String(reader.result).split(",")[1]);
@@ -323,9 +375,20 @@
         const playlist = await response.json();
         form.reset();
         form.elements.creator.value = "Manik Singh Mehra";
+        submitButton.classList.remove("is-loading");
+        submitButton.classList.add("is-success");
+        submitLabel.textContent = "Playlist published";
         status.textContent = `Published ${playlist.title}. Vercel will deploy the update shortly.`;
         savedList.innerHTML = `<li>${playlist.title} (${playlist.cover})</li>`;
+        setTimeout(() => {
+          submitButton.classList.remove("is-success");
+          submitLabel.textContent = "Add playlist to my site";
+          submitButton.disabled = false;
+        }, 2200);
       } catch (error) {
+        submitButton.disabled = false;
+        submitButton.classList.remove("is-loading", "is-success");
+        submitLabel.textContent = "Try publishing again";
         status.textContent = error.message;
       }
     });
