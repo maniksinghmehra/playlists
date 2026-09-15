@@ -50,7 +50,11 @@ module.exports = async (req, res) => {
   }
   try {
     const { playlist, image, imageType, adminPassword } = req.body;
-    if (!process.env.ADMIN_PASSWORD || adminPassword !== process.env.ADMIN_PASSWORD) {
+    if (!process.env.ADMIN_PASSWORD) {
+      res.status(500).json({ error: "ADMIN_PASSWORD is not configured for this Vercel deployment." });
+      return;
+    }
+    if (String(adminPassword || "").trim() !== process.env.ADMIN_PASSWORD.trim()) {
       res.status(401).json({ error: "Invalid admin password." });
       return;
     }

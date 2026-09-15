@@ -191,7 +191,7 @@
     };
 
     const unlockAdmin = async () => {
-      const password = loginPassword.value;
+      const password = loginPassword.value.trim();
       if (!password) {
         loginStatus.textContent = "Enter the admin password.";
         return;
