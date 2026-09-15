@@ -156,6 +156,11 @@ button, a, .playlist {
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
+.admin-link-label {
+  display: block;
+  transform: translateY(-1px);
+}
+
 .admin-link:hover {
   transform: translateY(-3px);
   background: rgba(255,255,255,0.14);
@@ -752,7 +757,7 @@ Stop-Process -Id 17584.review-overlay.active .rw-actions { transition-delay: 0.5
 </div>
 
 <div class="cursor-glow" id="cursor-glow"></div>
-<a class="admin-link" href="admin.html" target="_blank" rel="noopener" aria-label="Open playlist admin page in a new tab" title="Add playlist">+</a>
+<a class="admin-link" href="admin.html" target="_blank" rel="noopener" aria-label="Open playlist admin page in a new tab" title="Add playlist"><span class="admin-link-label">+</span></a>
 
 <div class="review-overlay" id="overlay">
   <div class="review-window" id="review-window" role="dialog" aria-modal="true" aria-labelledby="rw-title" tabindex="-1">
