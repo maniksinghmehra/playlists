@@ -123,6 +123,40 @@ body.window-open {
   will-change: transform;
 }
 
+.admin-link {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 20;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(22,24,28,0.86);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  font-size: 1.8rem;
+  font-weight: 300;
+  line-height: 1;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-link:hover {
+  transform: translateY(-3px);
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.35);
+}
+
+.admin-link:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
 .wrap {
   max-width: 1440px;
   margin: 0 auto;
@@ -625,6 +659,7 @@ Stop-Process -Id 17584.review-overlay.active .rw-actions { transition-delay: 0.5
 </div>
 
 <div class="cursor-glow" id="cursor-glow"></div>
+<a class="admin-link" href="admin.html" aria-label="Open playlist admin page" title="Add playlist">+</a>
 
 <div class="review-overlay" id="overlay">
   <div class="review-window" id="review-window" role="dialog" aria-modal="true" aria-labelledby="rw-title" tabindex="-1">
