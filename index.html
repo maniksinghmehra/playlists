@@ -16,6 +16,8 @@
 <link rel="shortcut icon" type="image/png" href="/tt.png?v=2">
 <link rel="apple-touch-icon" sizes="180x180" href="/tt.png?v=2">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Courier+New&display=swap" rel="stylesheet">
 
 <style>
@@ -267,6 +269,8 @@ header p {
   perspective: 1200px;
   border-radius: 10px;
   -webkit-tap-highlight-color: transparent;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 360px;
 }
 
 .playlist:focus-visible .playlist-inner {
@@ -1364,7 +1368,7 @@ const createPlaylistCard = (playlist) => {
   article.innerHTML = `
     <div class="playlist-inner">
       <div class="glare"></div>
-      <div class="playlist-art" style="background-image: url('${escapeHtml(localPlaceholderCover(playlist.cover))}');"></div>
+      <div class="playlist-art" data-cover="${escapeHtml(localPlaceholderCover(playlist.cover))}"></div>
       <h2>${escapeHtml(playlist.title)}</h2>
       <div class="creator">${escapeHtml(playlist.creator)}</div>
       <div class="description">${escapeHtml(playlist.description)}</div>
@@ -1383,6 +1387,29 @@ const renderPlaylists = () => {
 };
 
 renderPlaylists();
+
+const loadCover = card => {
+  const art = card.querySelector('.playlist-art');
+  if (!art || art.dataset.loaded === 'true') return;
+  art.style.backgroundImage = `url('${art.dataset.cover}')`;
+  art.dataset.loaded = 'true';
+};
+
+const coverObserver = 'IntersectionObserver' in window
+  ? new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          loadCover(entry.target);
+          coverObserver.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '400px 0px' })
+  : null;
+
+document.querySelectorAll('.playlist').forEach(card => {
+  if (coverObserver) coverObserver.observe(card);
+  else loadCover(card);
+});
 
 const overlay = document.getElementById('overlay');
 const closeBtn = document.getElementById('close-btn');
@@ -1404,10 +1431,8 @@ const openModal = (playlist) => {
   textEl.innerHTML = playlist.dataset.description;
 
   const cardArtDiv = playlist.querySelector('.playlist-art');
-  const bgImageStyle = cardArtDiv.style.backgroundImage;
-  const bgUrl = bgImageStyle.slice(5, -2);
-
-  rwImg.src = bgUrl || "";
+  loadCover(playlist);
+  rwImg.src = cardArtDiv.dataset.cover || "";
 
   spotifyBtn.href = playlist.dataset.spotify || '#';
   appleBtn.href = playlist.dataset.apple || '#';
