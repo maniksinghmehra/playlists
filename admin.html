@@ -166,11 +166,24 @@
     const passwordStorageKey = "playlist-admin-password";
 
     const verifyPassword = async (password) => {
-      const response = await fetch("/api/publish.js", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "verify", adminPassword: password })
-      });
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      let response;
+      try {
+        response = await fetch("/api/publish.js", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "verify", adminPassword: password }),
+          signal: controller.signal
+        });
+      } catch (error) {
+        if (error.name === "AbortError") {
+          throw new Error("Password verification timed out. Please try again.");
+        }
+        throw new Error("Could not reach the admin server. Please try again.");
+      } finally {
+        clearTimeout(timeout);
+      }
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
         throw new Error(error.error || "Invalid admin password.");

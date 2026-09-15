@@ -48,11 +48,6 @@ module.exports = async (req, res) => {
     res.status(405).json({ error: "POST required." });
     return;
   }
-  if (!process.env.GITHUB_TOKEN) {
-    res.status(500).json({ error: "GITHUB_TOKEN is not configured in Vercel." });
-    return;
-  }
-
   try {
     const { playlist, image, imageType, adminPassword } = req.body;
     if (!process.env.ADMIN_PASSWORD || adminPassword !== process.env.ADMIN_PASSWORD) {
@@ -61,6 +56,10 @@ module.exports = async (req, res) => {
     }
     if (req.body.action === "verify") {
       res.status(200).json({ ok: true });
+      return;
+    }
+    if (!process.env.GITHUB_TOKEN) {
+      res.status(500).json({ error: "GITHUB_TOKEN is not configured in Vercel." });
       return;
     }
     if (!playlist || !playlist.title || !image) throw new Error("Playlist title and cover image are required.");
