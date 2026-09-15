@@ -167,6 +167,21 @@
     const adminShell = document.getElementById("admin-shell");
     const passwordStorageKey = "playlist-admin-password";
 
+    const showAdminPage = () => {
+      loginPanel.hidden = true;
+      loginPanel.style.display = "none";
+      adminShell.hidden = false;
+      adminShell.style.display = "block";
+      loginStatus.textContent = "";
+    };
+
+    const showLoginPage = () => {
+      loginPanel.hidden = false;
+      loginPanel.style.display = "grid";
+      adminShell.hidden = true;
+      adminShell.style.display = "none";
+    };
+
     const verifyPassword = async (password) => {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
@@ -204,11 +219,10 @@
       try {
         await verifyPassword(password);
         sessionStorage.setItem(passwordStorageKey, password);
-        loginPanel.hidden = true;
-        loginStatus.textContent = "";
-        adminShell.hidden = false;
+        showAdminPage();
       } catch (error) {
         sessionStorage.removeItem(passwordStorageKey);
+        showLoginPage();
         loginStatus.textContent = error.message;
         loginPassword.select();
       } finally {
@@ -216,7 +230,10 @@
       }
     };
 
-    loginButton.addEventListener("click", unlockAdmin);
+    loginButton.addEventListener("click", event => {
+      event.preventDefault();
+      unlockAdmin();
+    });
     loginPassword.addEventListener("keydown", event => {
       if (event.key === "Enter") unlockAdmin();
     });
@@ -225,8 +242,7 @@
       event.preventDefault();
       const password = sessionStorage.getItem(passwordStorageKey);
       if (!password) {
-        loginPanel.hidden = false;
-        adminShell.hidden = true;
+        showLoginPage();
         loginPassword.focus();
         return;
       }
@@ -256,8 +272,7 @@
           const error = await response.json().catch(() => ({}));
           if (response.status === 401) {
             sessionStorage.removeItem(passwordStorageKey);
-            loginPanel.hidden = false;
-            adminShell.hidden = true;
+            showLoginPage();
             loginPassword.focus();
           }
           throw new Error(error.error || `Publish failed (${response.status})`);
@@ -277,8 +292,7 @@
     if (existingPassword) {
       verifyPassword(existingPassword)
         .then(() => {
-          loginPanel.hidden = true;
-          adminShell.hidden = false;
+          showAdminPage();
         })
         .catch(() => sessionStorage.removeItem(passwordStorageKey));
     }
