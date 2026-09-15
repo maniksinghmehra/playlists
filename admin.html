@@ -13,13 +13,42 @@
     }
 
     body {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 40px 20px;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      background: #0b0d10;
     }
 
     h1 { margin-bottom: 8px; }
     p { color: rgba(234, 234, 234, .65); }
+
+    .login-screen {
+      min-height: calc(100vh - 40px);
+      display: grid;
+      place-items: center;
+    }
+
+    .login-card {
+      width: min(100%, 380px);
+      padding: 28px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 14px;
+      background: rgba(22, 24, 28, .92);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, .35);
+    }
+
+    .login-card h1 { margin-bottom: 8px; }
+
+    .login-card button {
+      width: 100%;
+      margin-top: 14px;
+    }
+
+    #admin-shell {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 20px 0 40px;
+    }
 
     form {
       display: grid;
@@ -65,60 +94,65 @@
 
     .links a { color: #b7d7ff; }
     #status { min-height: 1.5em; color: #9fdbad; }
-    #admin-content { display: none; }
     #saved-list { padding-left: 20px; }
     #saved-list li { margin: 10px 0; }
     #saved-list button { margin-left: 8px; padding: 5px 9px; }
   </style>
 </head>
 <body>
-  <h1>Playlist Admin</h1>
-  <p>Fill in the playlist details and choose a cover image. Saving publishes the playlist to the live site.</p>
+  <main class="login-screen" id="login-panel">
+    <div class="login-card">
+      <h1>Admin access</h1>
+      <p>Enter the password to open the playlist admin page.</p>
+      <label>Admin password
+        <input id="login-password" type="password" autocomplete="current-password" required autofocus>
+      </label>
+      <button id="login-button" type="button">Enter admin page</button>
+      <p id="login-status" role="status"></p>
+    </div>
+  </main>
 
-  <div id="login-panel">
-    <label>Admin password
-      <input id="login-password" type="password" autocomplete="current-password" required>
-    </label>
-    <button id="login-button" type="button">Unlock admin page</button>
-  </div>
-  <p id="login-status" role="status"></p>
+  <main id="admin-shell" hidden>
+    <h1>Playlist Admin</h1>
+    <p>Fill in the playlist details and choose a cover image. Saving publishes the playlist to the live site.</p>
 
-  <div id="admin-content">
-  <form id="playlist-form">
-    <label>Title
-      <input name="title" required>
-    </label>
-    <label>Creator
-      <input name="creator" value="Manik Singh Mehra" required>
-    </label>
-    <label>Cover image
-      <input name="coverFile" type="file" accept="image/jpeg,image/png,image/webp" required>
-    </label>
-    <label>Spotify link
-      <input name="spotify" type="url" placeholder="https://open.spotify.com/playlist/...">
-    </label>
-    <label>Apple Music link
-      <input name="apple" type="url" placeholder="https://music.apple.com/...">
-    </label>
-    <label>YouTube Music link
-      <input name="youtube" type="url" placeholder="https://music.youtube.com/playlist?...">
-    </label>
-    <label>Short description
-      <textarea name="description" required></textarea>
-    </label>
-    <label>Full description
-      <textarea name="fullDescription" required></textarea>
-    </label>
-    <button type="submit">Add playlist to my site</button>
-  </form>
+    <div id="admin-content">
+      <form id="playlist-form">
+        <label>Title
+          <input name="title" required>
+        </label>
+        <label>Creator
+          <input name="creator" value="Manik Singh Mehra" required>
+        </label>
+        <label>Cover image
+          <input name="coverFile" type="file" accept="image/jpeg,image/png,image/webp" required>
+        </label>
+        <label>Spotify link
+          <input name="spotify" type="url" placeholder="https://open.spotify.com/playlist/...">
+        </label>
+        <label>Apple Music link
+          <input name="apple" type="url" placeholder="https://music.apple.com/...">
+        </label>
+        <label>YouTube Music link
+          <input name="youtube" type="url" placeholder="https://music.youtube.com/playlist?...">
+        </label>
+        <label>Short description
+          <textarea name="description" required></textarea>
+        </label>
+        <label>Full description
+          <textarea name="fullDescription" required></textarea>
+        </label>
+        <button type="submit">Add playlist to my site</button>
+      </form>
 
-  <p id="status" role="status"></p>
-  <h2>Added playlists</h2>
-  <ul id="saved-list"></ul>
-  <div class="links">
-    <a href="index.html">Open main playlist site</a>
-  </div>
-  </div>
+      <p id="status" role="status"></p>
+      <h2>Added playlists</h2>
+      <ul id="saved-list"></ul>
+      <div class="links">
+        <a href="index.html">Open main playlist site</a>
+      </div>
+    </div>
+  </main>
 
   <script>
     const form = document.getElementById("playlist-form");
@@ -128,7 +162,7 @@
     const loginPassword = document.getElementById("login-password");
     const loginButton = document.getElementById("login-button");
     const loginStatus = document.getElementById("login-status");
-    const adminContent = document.getElementById("admin-content");
+    const adminShell = document.getElementById("admin-shell");
     const passwordStorageKey = "playlist-admin-password";
 
     const verifyPassword = async (password) => {
@@ -157,7 +191,7 @@
         sessionStorage.setItem(passwordStorageKey, password);
         loginPanel.hidden = true;
         loginStatus.textContent = "";
-        adminContent.style.display = "block";
+        adminShell.hidden = false;
       } catch (error) {
         sessionStorage.removeItem(passwordStorageKey);
         loginStatus.textContent = error.message;
@@ -177,7 +211,7 @@
       const password = sessionStorage.getItem(passwordStorageKey);
       if (!password) {
         loginPanel.hidden = false;
-        adminContent.style.display = "none";
+        adminShell.hidden = true;
         loginPassword.focus();
         return;
       }
@@ -208,7 +242,7 @@
           if (response.status === 401) {
             sessionStorage.removeItem(passwordStorageKey);
             loginPanel.hidden = false;
-            adminContent.style.display = "none";
+            adminShell.hidden = true;
             loginPassword.focus();
           }
           throw new Error(error.error || `Publish failed (${response.status})`);
@@ -229,7 +263,7 @@
       verifyPassword(existingPassword)
         .then(() => {
           loginPanel.hidden = true;
-          adminContent.style.display = "block";
+          adminShell.hidden = false;
         })
         .catch(() => sessionStorage.removeItem(passwordStorageKey));
     }
