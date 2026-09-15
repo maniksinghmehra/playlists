@@ -59,6 +59,10 @@ module.exports = async (req, res) => {
       res.status(401).json({ error: "Invalid admin password." });
       return;
     }
+    if (req.body.action === "verify") {
+      res.status(200).json({ ok: true });
+      return;
+    }
     if (!playlist || !playlist.title || !image) throw new Error("Playlist title and cover image are required.");
     const extension = imageType === "image/png" ? ".png" : imageType === "image/webp" ? ".webp" : ".jpg";
     const cover = `${slugify(playlist.title)}${extension}`;

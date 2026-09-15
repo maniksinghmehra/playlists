@@ -65,6 +65,7 @@
 
     .links a { color: #b7d7ff; }
     #status { min-height: 1.5em; color: #9fdbad; }
+    #admin-content { display: none; }
     #saved-list { padding-left: 20px; }
     #saved-list li { margin: 10px 0; }
     #saved-list button { margin-left: 8px; padding: 5px 9px; }
@@ -74,15 +75,21 @@
   <h1>Playlist Admin</h1>
   <p>Fill in the playlist details and choose a cover image. Saving publishes the playlist to the live site.</p>
 
+  <div id="login-panel">
+    <label>Admin password
+      <input id="login-password" type="password" autocomplete="current-password" required>
+    </label>
+    <button id="login-button" type="button">Unlock admin page</button>
+  </div>
+  <p id="login-status" role="status"></p>
+
+  <div id="admin-content">
   <form id="playlist-form">
     <label>Title
       <input name="title" required>
     </label>
     <label>Creator
       <input name="creator" value="Manik Singh Mehra" required>
-    </label>
-    <label>Admin password
-      <input name="adminPassword" type="password" autocomplete="current-password" required>
     </label>
     <label>Cover image
       <input name="coverFile" type="file" accept="image/jpeg,image/png,image/webp" required>
@@ -111,23 +118,69 @@
   <div class="links">
     <a href="index.html">Open main playlist site</a>
   </div>
+  </div>
 
   <script>
     const form = document.getElementById("playlist-form");
     const status = document.getElementById("status");
     const savedList = document.getElementById("saved-list");
+    const loginPanel = document.getElementById("login-panel");
+    const loginPassword = document.getElementById("login-password");
+    const loginButton = document.getElementById("login-button");
+    const loginStatus = document.getElementById("login-status");
+    const adminContent = document.getElementById("admin-content");
     const passwordStorageKey = "playlist-admin-password";
+
+    const verifyPassword = async (password) => {
+      const response = await fetch("/api/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "verify", adminPassword: password })
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || "Invalid admin password.");
+      }
+    };
+
+    const unlockAdmin = async () => {
+      const password = loginPassword.value;
+      if (!password) {
+        loginStatus.textContent = "Enter the admin password.";
+        return;
+      }
+
+      loginButton.disabled = true;
+      loginStatus.textContent = "Checking password...";
+      try {
+        await verifyPassword(password);
+        sessionStorage.setItem(passwordStorageKey, password);
+        loginPanel.hidden = true;
+        loginStatus.textContent = "";
+        adminContent.style.display = "block";
+      } catch (error) {
+        sessionStorage.removeItem(passwordStorageKey);
+        loginStatus.textContent = error.message;
+        loginPassword.select();
+      } finally {
+        loginButton.disabled = false;
+      }
+    };
+
+    loginButton.addEventListener("click", unlockAdmin);
+    loginPassword.addEventListener("keydown", event => {
+      if (event.key === "Enter") unlockAdmin();
+    });
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
-      const passwordInput = form.elements.adminPassword;
-      const password = sessionStorage.getItem(passwordStorageKey) || passwordInput.value;
+      const password = sessionStorage.getItem(passwordStorageKey);
       if (!password) {
-        status.textContent = "Admin password is required to publish playlists.";
-        passwordInput.focus();
+        loginPanel.hidden = false;
+        adminContent.style.display = "none";
+        loginPassword.focus();
         return;
       }
-      sessionStorage.setItem(passwordStorageKey, password);
 
       const file = form.elements.coverFile.files[0];
       if (!file) {
@@ -154,7 +207,9 @@
           const error = await response.json().catch(() => ({}));
           if (response.status === 401) {
             sessionStorage.removeItem(passwordStorageKey);
-            passwordInput.value = "";
+            loginPanel.hidden = false;
+            adminContent.style.display = "none";
+            loginPassword.focus();
           }
           throw new Error(error.error || `Publish failed (${response.status})`);
         }
@@ -162,13 +217,22 @@
         const playlist = await response.json();
         form.reset();
         form.elements.creator.value = "Manik Singh Mehra";
-        form.elements.adminPassword.value = password;
         status.textContent = `Published ${playlist.title}. Vercel will deploy the update shortly.`;
         savedList.innerHTML = `<li>${playlist.title} (${playlist.cover})</li>`;
       } catch (error) {
         status.textContent = error.message;
       }
     });
+
+    const existingPassword = sessionStorage.getItem(passwordStorageKey);
+    if (existingPassword) {
+      verifyPassword(existingPassword)
+        .then(() => {
+          loginPanel.hidden = true;
+          adminContent.style.display = "block";
+        })
+        .catch(() => sessionStorage.removeItem(passwordStorageKey));
+    }
   </script>
 </body>
 </html>
