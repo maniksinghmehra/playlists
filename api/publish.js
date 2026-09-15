@@ -2,6 +2,12 @@ const OWNER = process.env.GITHUB_OWNER || "maniksinghmehra";
 const REPO = process.env.GITHUB_REPO || "playlists";
 const BRANCH = process.env.GITHUB_BRANCH || "main";
 const API = "https://api.github.com";
+const normalizePassword = value => {
+  const password = String(value || "").trim();
+  return password.length >= 2 && /^(['"]).*\1$/.test(password)
+    ? password.slice(1, -1)
+    : password;
+};
 
 const slugify = value => value
   .normalize("NFKD")
@@ -54,7 +60,7 @@ module.exports = async (req, res) => {
       res.status(500).json({ error: "ADMIN_PASSWORD is not configured for this Vercel deployment." });
       return;
     }
-    if (String(adminPassword || "").trim() !== process.env.ADMIN_PASSWORD.trim()) {
+    if (normalizePassword(adminPassword) !== normalizePassword(process.env.ADMIN_PASSWORD)) {
       res.status(401).json({ error: "Invalid admin password." });
       return;
     }
