@@ -81,6 +81,9 @@
     <label>Creator
       <input name="creator" value="Manik Singh Mehra" required>
     </label>
+    <label>Admin password
+      <input name="adminPassword" type="password" autocomplete="current-password" required>
+    </label>
     <label>Cover image
       <input name="coverFile" type="file" accept="image/jpeg,image/png,image/webp" required>
     </label>
@@ -115,30 +118,16 @@
     const savedList = document.getElementById("saved-list");
     const passwordStorageKey = "playlist-admin-password";
 
-    const requestAdminPassword = () => {
-      const savedPassword = sessionStorage.getItem(passwordStorageKey);
-      if (savedPassword) {
-        return savedPassword;
-      }
-
-      const password = window.prompt("Enter the admin password:");
-      if (!password) {
-        status.textContent = "Admin password is required to publish playlists.";
-        return null;
-      }
-
-      sessionStorage.setItem(passwordStorageKey, password);
-      return password;
-    };
-
-    requestAdminPassword();
-
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
-      const password = requestAdminPassword();
+      const passwordInput = form.elements.adminPassword;
+      const password = sessionStorage.getItem(passwordStorageKey) || passwordInput.value;
       if (!password) {
+        status.textContent = "Admin password is required to publish playlists.";
+        passwordInput.focus();
         return;
       }
+      sessionStorage.setItem(passwordStorageKey, password);
 
       const file = form.elements.coverFile.files[0];
       if (!file) {
@@ -154,6 +143,7 @@
           reader.readAsDataURL(file);
         });
         const values = Object.fromEntries(new FormData(form));
+        delete values.adminPassword;
         delete values.coverFile;
         const response = await fetch("/api/publish", {
           method: "POST",
@@ -164,6 +154,7 @@
           const error = await response.json().catch(() => ({}));
           if (response.status === 401) {
             sessionStorage.removeItem(passwordStorageKey);
+            passwordInput.value = "";
           }
           throw new Error(error.error || `Publish failed (${response.status})`);
         }
@@ -171,6 +162,7 @@
         const playlist = await response.json();
         form.reset();
         form.elements.creator.value = "Manik Singh Mehra";
+        form.elements.adminPassword.value = password;
         status.textContent = `Published ${playlist.title}. Vercel will deploy the update shortly.`;
         savedList.innerHTML = `<li>${playlist.title} (${playlist.cover})</li>`;
       } catch (error) {
