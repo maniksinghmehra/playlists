@@ -37,11 +37,16 @@ const commitFile = async (path, content, message, sha) => github(path, {
   body: JSON.stringify({ message, content, branch: BRANCH, ...(sha ? { sha } : {}) })
 });
 
-const updateIndex = async (object, title) => {
-  const placeholder = /  \{\s*title:\s*"Playlist Name \d+"[\s\S]*?\n  \},?/g;
+const playlistObject = (playlist, cover) => `  {\n    title: ${JSON.stringify(playlist.title)},\n    creator: ${JSON.stringify(playlist.creator)},\n    cover: ${JSON.stringify(cover)},\n    spotify: ${JSON.stringify(playlist.spotify || "")},\n    apple: ${JSON.stringify(playlist.apple || "")},\n    youtube: ${JSON.stringify(playlist.youtube || "")},\n    description: ${JSON.stringify(playlist.description || "")},\n    fullDescription: ${JSON.stringify(playlist.fullDescription || "")}\n  },`;
+
+const updateIndex = async (object, title, originalTitle) => {
+  const escapedTitle = String(originalTitle || title).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const target = originalTitle
+    ? new RegExp(`  \\{\\s*title:\\s*"${escapedTitle}"[\\s\\S]*?\\n  \\},?`)
+    : /  \{\s*title:\s*"Playlist Name \d+"[\s\S]*?\n  \},?/;
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const indexFile = await getFile("index.html");
-    const matches = [...indexFile.text.matchAll(placeholder)];
+    const matches = originalTitle ? [indexFile.text.match(target)].filter(Boolean) : [...indexFile.text.matchAll(new RegExp(target.source, "g"))];
     let updatedIndex = indexFile.text;
     if (matches.length > 0) {
       const match = matches[matches.length - 1];
@@ -65,6 +70,29 @@ const getFile = async path => {
     return {
       text: Buffer.from(file.content, "base64").toString("utf8"),
       sha: file.sha
+    };
+
+    const readPlaylists = text => {
+      const records = [];
+      const objectPattern = /  \{\s*title:\s*("[^"]*(?:\\.[^"]*)*")[\s\S]*?\n  \},?/g;
+      for (const match of text.matchAll(objectPattern)) {
+        const block = match[0];
+        const value = field => {
+          const fieldMatch = block.match(new RegExp(`\\n    ${field}:\\s*("[^"]*(?:\\\\.[^"]*)*")`));
+          return fieldMatch ? JSON.parse(fieldMatch[1]) : "";
+        };
+        records.push({
+          title: JSON.parse(match[1]),
+          creator: value("creator"),
+          cover: value("cover"),
+          spotify: value("spotify"),
+          apple: value("apple"),
+          youtube: value("youtube"),
+          description: value("description"),
+          fullDescription: value("fullDescription")
+        });
+      }
+      return records;
     };
   } catch (error) {
     if (error.message.includes("Not Found")) return { text: "", sha: undefined };
@@ -92,17 +120,28 @@ module.exports = async (req, res) => {
       res.status(200).json({ ok: true });
       return;
     }
+    if (req.body.action === "list") {
+      if (!process.env.GITHUB_TOKEN) throw new Error("GITHUB_TOKEN is not configured in Vercel.");
+      const indexFile = await getFile("index.html");
+      res.status(200).json({ playlists: readPlaylists(indexFile.text) });
+      return;
+    }
     if (!process.env.GITHUB_TOKEN) {
       res.status(500).json({ error: "GITHUB_TOKEN is not configured in Vercel." });
       return;
     }
-    if (!playlist || !playlist.title || !image) throw new Error("Playlist title and cover image are required.");
+    if (!playlist || !playlist.title || (req.body.action !== "edit" && !image)) {
+      throw new Error("Playlist title and cover image are required.");
+    }
     const extension = imageType === "image/png" ? ".png" : imageType === "image/webp" ? ".webp" : ".jpg";
-    const cover = `${slugify(playlist.title)}${extension}`;
-    const object = `  {\n    title: ${JSON.stringify(playlist.title)},\n    creator: ${JSON.stringify(playlist.creator)},\n    cover: ${JSON.stringify(cover)},\n    spotify: ${JSON.stringify(playlist.spotify || "")},\n    apple: ${JSON.stringify(playlist.apple || "")},\n    youtube: ${JSON.stringify(playlist.youtube || "")},\n    description: ${JSON.stringify(playlist.description || "")},\n    fullDescription: ${JSON.stringify(playlist.fullDescription || "")}\n  },`;
-    const existingCover = await getFile(cover);
-    await commitFile(cover, image, `Add cover for ${playlist.title}`, existingCover.sha);
-    await updateIndex(object, playlist.title);
+    const originalTitle = req.body.action === "edit" ? req.body.originalTitle : "";
+    const cover = image ? `${slugify(playlist.title)}${extension}` : playlist.cover;
+    const object = playlistObject(playlist, cover);
+    if (image) {
+      const existingCover = await getFile(cover);
+      await commitFile(cover, image, `${originalTitle ? "Update" : "Add"} cover for ${playlist.title}`, existingCover.sha);
+    }
+    await updateIndex(object, playlist.title, originalTitle);
     res.status(200).json({ ...playlist, cover });
   } catch (error) {
     res.status(400).json({ error: error.message });

@@ -162,6 +162,11 @@
     #saved-list { padding-left: 20px; }
     #saved-list li { margin: 10px 0; }
     #saved-list button { margin-left: 8px; padding: 5px 9px; }
+    #edit-section {
+      margin-top: 36px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,.12);
+    }
 
     @media (min-width: 600px) {
       body { padding-left: 24px; padding-right: 24px; }
@@ -237,6 +242,14 @@
       </form>
 
       <p id="status" role="status"></p>
+      <section id="edit-section">
+        <h2>Edit existing playlist</h2>
+        <p>Select a published playlist to load its details into the form.</p>
+        <label>Playlist to edit
+          <select id="edit-playlist"></select>
+        </label>
+        <button id="edit-load" type="button">Load playlist</button>
+      </section>
       <h2>Added playlists</h2>
       <ul id="saved-list"></ul>
       <div class="links">
@@ -257,6 +270,10 @@
     const submitButton = document.getElementById("submit-button");
     const submitLabel = submitButton.querySelector(".submit-label");
     const passwordStorageKey = "playlist-admin-password";
+    const editSelect = document.getElementById("edit-playlist");
+    const editLoadButton = document.getElementById("edit-load");
+    let editingTitle = "";
+    let editingCover = "";
 
     const showAdminPage = () => {
       loginPanel.hidden = true;
@@ -297,6 +314,34 @@
         throw new Error(error.error || "Invalid admin password.");
       }
     };
+
+    const loadEditablePlaylists = async () => {
+      const response = await fetch("/api/publish.js", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "list", adminPassword: sessionStorage.getItem(passwordStorageKey) })
+      });
+      if (!response.ok) throw new Error("Could not load published playlists.");
+      const { playlists } = await response.json();
+      editSelect.replaceChildren(...playlists.map(playlist => {
+        const option = new Option(playlist.title, JSON.stringify(playlist));
+        return option;
+      }));
+    };
+
+    const loadSelectedPlaylist = () => {
+      const playlist = JSON.parse(editSelect.value);
+      editingTitle = playlist.title;
+      editingCover = playlist.cover;
+      for (const [name, value] of Object.entries(playlist)) {
+        if (name !== "title" && name !== "cover" && form.elements[name]) form.elements[name].value = value || "";
+      }
+      form.elements.coverFile.required = false;
+      submitLabel.textContent = "Save playlist changes";
+      form.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    editLoadButton.addEventListener("click", loadSelectedPlaylist);
 
     const unlockAdmin = async () => {
       const password = loginPassword.value.trim();
@@ -348,19 +393,20 @@
         submitButton.disabled = true;
         submitButton.classList.add("is-loading");
         submitLabel.textContent = "Publishing playlist...";
-        const coverData = await new Promise((resolve, reject) => {
+        const coverData = file ? await new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(String(reader.result).split(",")[1]);
           reader.onerror = () => reject(new Error("Could not read cover image."));
           reader.readAsDataURL(file);
-        });
+        }) : "";
         const values = Object.fromEntries(new FormData(form));
         delete values.adminPassword;
         delete values.coverFile;
+        values.cover = editingCover;
         const response = await fetch("/api/publish.js", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ playlist: values, image: coverData, imageType: file.type, adminPassword: password })
+          body: JSON.stringify({ action: editingTitle ? "edit" : "add", originalTitle: editingTitle, playlist: values, image: coverData, imageType: file.type, adminPassword: password })
         });
         if (!response.ok) {
           const error = await response.json().catch(() => ({}));
@@ -375,11 +421,15 @@
         const playlist = await response.json();
         form.reset();
         form.elements.creator.value = "Manik Singh Mehra";
+        editingTitle = "";
+        editingCover = "";
+        form.elements.coverFile.required = true;
         submitButton.classList.remove("is-loading");
         submitButton.classList.add("is-success");
         submitLabel.textContent = "Playlist published";
         status.textContent = `Published ${playlist.title}. Vercel will deploy the update shortly.`;
         savedList.innerHTML = `<li>${playlist.title} (${playlist.cover})</li>`;
+        await loadEditablePlaylists();
         setTimeout(() => {
           submitButton.classList.remove("is-success");
           submitLabel.textContent = "Add playlist to my site";
@@ -398,6 +448,9 @@
       verifyPassword(existingPassword)
         .then(() => {
           showAdminPage();
+          loadEditablePlaylists().catch(error => {
+            status.textContent = error.message;
+          });
         })
         .catch(() => sessionStorage.removeItem(passwordStorageKey));
     }
