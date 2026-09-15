@@ -166,7 +166,7 @@
     const passwordStorageKey = "playlist-admin-password";
 
     const verifyPassword = async (password) => {
-      const response = await fetch("/api/publish", {
+      const response = await fetch("/api/publish.js", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "verify", adminPassword: password })
@@ -232,7 +232,7 @@
         const values = Object.fromEntries(new FormData(form));
         delete values.adminPassword;
         delete values.coverFile;
-        const response = await fetch("/api/publish", {
+        const response = await fetch("/api/publish.js", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ playlist: values, image: coverData, imageType: file.type, adminPassword: password })
