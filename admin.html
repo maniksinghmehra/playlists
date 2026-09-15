@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Playlist Admin</title>
   <style>
     :root {
@@ -10,29 +10,35 @@
       font-family: Inter, Arial, sans-serif;
       background: #0b0d10;
       color: #eaeaea;
+      -webkit-text-size-adjust: 100%;
     }
+
+    * { box-sizing: border-box; }
 
     body {
       min-height: 100vh;
       margin: 0;
-      padding: 20px;
+      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+        max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
       background: #0b0d10;
     }
 
     [hidden] { display: none !important; }
 
     h1 { margin-bottom: 8px; }
+    h1, h2 { line-height: 1.2; }
     p { color: rgba(234, 234, 234, .65); }
 
     .login-screen {
-      min-height: calc(100vh - 40px);
+      min-height: calc(100svh - 32px);
       display: grid;
       place-items: center;
+      padding: 16px 0;
     }
 
     .login-card {
       width: min(100%, 380px);
-      padding: 28px;
+      padding: clamp(22px, 5vw, 32px);
       border: 1px solid rgba(255, 255, 255, .12);
       border-radius: 14px;
       background: rgba(22, 24, 28, .92);
@@ -47,9 +53,9 @@
     }
 
     #admin-shell {
-      max-width: 760px;
+      width: min(100%, 760px);
       margin: 0 auto;
-      padding: 20px 0 40px;
+      padding: clamp(8px, 3vw, 20px) 0 40px;
     }
 
     form {
@@ -67,25 +73,34 @@
 
     input, textarea, button {
       font: inherit;
+      width: 100%;
       border: 1px solid rgba(255, 255, 255, .16);
       border-radius: 8px;
       padding: 11px 12px;
+      min-height: 46px;
     }
 
     input, textarea {
       color: #fff;
       background: rgba(255, 255, 255, .07);
+      font-size: 16px;
     }
 
-    textarea { min-height: 90px; resize: vertical; }
+    textarea { min-height: 110px; resize: vertical; }
 
     button {
       color: #fff;
       background: #3d526b;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
     button:hover { filter: brightness(1.2); }
+    button:disabled { opacity: .65; cursor: wait; }
+    input:focus-visible, textarea:focus-visible, button:focus-visible {
+      outline: 2px solid #b7d7ff;
+      outline-offset: 2px;
+    }
 
     .links {
       display: flex;
@@ -96,9 +111,33 @@
 
     .links a { color: #b7d7ff; }
     #status { min-height: 1.5em; color: #9fdbad; }
+    #login-status { min-height: 1.5em; margin-bottom: 0; }
     #saved-list { padding-left: 20px; }
     #saved-list li { margin: 10px 0; }
     #saved-list button { margin-left: 8px; padding: 5px 9px; }
+
+    @media (min-width: 600px) {
+      body { padding-left: 24px; padding-right: 24px; }
+      form { gap: 16px; }
+    }
+
+    @media (max-width: 599px) {
+      body { font-size: 15px; }
+      h1 { font-size: clamp(1.65rem, 8vw, 2rem); }
+      h2 { font-size: 1.25rem; }
+      form { margin-top: 22px; }
+      .links { margin-top: 20px; }
+    }
+
+    @media (max-width: 380px) {
+      body { padding-left: 12px; padding-right: 12px; }
+      .login-card { border-radius: 12px; }
+    }
+
+    @media (max-height: 520px) and (orientation: landscape) {
+      .login-screen { min-height: auto; }
+      .login-card { margin: 12px 0; }
+    }
   </style>
 </head>
 <body>
