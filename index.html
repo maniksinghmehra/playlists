@@ -1328,19 +1328,6 @@ playlists.forEach(playlist => {
   }
 });
 
-const savedPlaylistsKey = "manik-playlists";
-const savedPlaylists = JSON.parse(localStorage.getItem(savedPlaylistsKey) || "[]");
-if (Array.isArray(savedPlaylists)) {
-  savedPlaylists.forEach(savedPlaylist => {
-    if (Number.isInteger(savedPlaylist.slotIndex) && playlists[savedPlaylist.slotIndex]) {
-      const { slotIndex, ...playlist } = savedPlaylist;
-      playlists[slotIndex] = playlist;
-    } else {
-      playlists.push(savedPlaylist);
-    }
-  });
-}
-
 const escapeHtml = (value) => String(value)
   .replaceAll("&", "&amp;")
   .replaceAll("<", "&lt;")
