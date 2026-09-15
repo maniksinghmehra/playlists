@@ -162,6 +162,36 @@
     #saved-list { padding-left: 20px; }
     #saved-list li { margin: 10px 0; }
     #saved-list button { margin-left: 8px; padding: 5px 9px; }
+    #edit-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+    .edit-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      background: rgba(255,255,255,.04);
+    }
+    .edit-item span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .edit-item button {
+      width: auto;
+      min-width: 76px;
+      min-height: 40px;
+      padding: 8px 12px;
+      flex: 0 0 auto;
+    }
     #edit-section {
       margin-top: 36px;
       padding-top: 24px;
@@ -244,11 +274,8 @@
       <p id="status" role="status"></p>
       <section id="edit-section">
         <h2>Edit existing playlist</h2>
-        <p>Select a published playlist to load its details into the form.</p>
-        <label>Playlist to edit
-          <select id="edit-playlist"></select>
-        </label>
-        <button id="edit-load" type="button">Load playlist</button>
+        <p>All playlists are listed below. Choose <strong>Edit</strong> beside any playlist to load its details into the form.</p>
+        <div id="edit-list" aria-live="polite"></div>
       </section>
       <h2>Added playlists</h2>
       <ul id="saved-list"></ul>
@@ -270,8 +297,8 @@
     const submitButton = document.getElementById("submit-button");
     const submitLabel = submitButton.querySelector(".submit-label");
     const passwordStorageKey = "playlist-admin-password";
-    const editSelect = document.getElementById("edit-playlist");
-    const editLoadButton = document.getElementById("edit-load");
+    const editList = document.getElementById("edit-list");
+    let editablePlaylists = [];
     let editingTitle = "";
     let editingCover = "";
 
@@ -323,14 +350,22 @@
       });
       if (!response.ok) throw new Error("Could not load published playlists.");
       const { playlists } = await response.json();
-      editSelect.replaceChildren(...playlists.map(playlist => {
-        const option = new Option(playlist.title, JSON.stringify(playlist));
-        return option;
+      editablePlaylists = playlists;
+      editList.replaceChildren(...playlists.map((playlist, index) => {
+        const item = document.createElement("div");
+        item.className = "edit-item";
+        const title = document.createElement("span");
+        title.textContent = `${index + 1}. ${playlist.title}`;
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = "Edit";
+        button.addEventListener("click", () => loadSelectedPlaylist(playlist));
+        item.append(title, button);
+        return item;
       }));
     };
 
-    const loadSelectedPlaylist = () => {
-      const playlist = JSON.parse(editSelect.value);
+    const loadSelectedPlaylist = (playlist) => {
       editingTitle = playlist.title;
       editingCover = playlist.cover;
       for (const [name, value] of Object.entries(playlist)) {
@@ -356,6 +391,9 @@
         await verifyPassword(password);
         sessionStorage.setItem(passwordStorageKey, password);
         showAdminPage();
+        loadEditablePlaylists().catch(error => {
+          status.textContent = error.message;
+        });
       } catch (error) {
         sessionStorage.removeItem(passwordStorageKey);
         showLoginPage();
@@ -384,7 +422,7 @@
       }
 
       const file = form.elements.coverFile.files[0];
-      if (!file) {
+      if (!file && !editingTitle) {
         status.textContent = "Choose a cover image.";
         return;
       }
