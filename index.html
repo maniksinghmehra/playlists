@@ -1339,6 +1339,15 @@ const escapeHtml = (value) => String(value)
   .replaceAll('"', "&quot;")
   .replaceAll("'", "&#039;");
 
+const localPlaceholderCover = (cover) => {
+  if (!cover.startsWith("https://via.placeholder.com/")) return cover;
+  const url = new URL(cover);
+  const color = `#${url.pathname.split("/")[3] || "222222"}`;
+  const text = url.searchParams.get("text") || "";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><rect width="300" height="300" fill="${color}"/><text x="150" y="164" text-anchor="middle" fill="#ffffff" font-family="Arial,sans-serif" font-size="72">${text}</text></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+};
+
 const createPlaylistCard = (playlist) => {
   const article = document.createElement('article');
   article.className = 'playlist';
@@ -1355,7 +1364,7 @@ const createPlaylistCard = (playlist) => {
   article.innerHTML = `
     <div class="playlist-inner">
       <div class="glare"></div>
-      <div class="playlist-art" style="background-image: url('${escapeHtml(playlist.cover)}');"></div>
+      <div class="playlist-art" style="background-image: url('${escapeHtml(localPlaceholderCover(playlist.cover))}');"></div>
       <h2>${escapeHtml(playlist.title)}</h2>
       <div class="creator">${escapeHtml(playlist.creator)}</div>
       <div class="description">${escapeHtml(playlist.description)}</div>
